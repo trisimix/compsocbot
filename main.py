@@ -17,7 +17,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.content.startswith('!'):
+    if True:
         await handle_command(message)
 
 async def handle_command(message):
