@@ -1,6 +1,5 @@
 import tictactoe
-
-
+import asyncio
 
 class Commands:
     def __init__(self, client):
@@ -11,15 +10,16 @@ class Commands:
         await self.client.send_message(message.channel, 'pong!')
 
     async def quote(self, message):
-        await self.client.delete_message(message)
+
         await self.client.send_message(message.channel, '***SPEED AND POWER***')
 
     async def ignore_command(self, message):
         print('Ignoring invalid command: ' + message.content)
-        await self.client.delete_message(message)
 
     async def stop(self, message):
-        await self.client.send_message(message.channel, '_Getting fired from BBC_')
+        logout_message = await self.client.send_message(message.channel, '_Getting fired from BBC_')
+        await asyncio.sleep(5)
+        await self.client.delete_message(logout_message)
         await self.client.logout()
 
     async def newgame(self, message):
@@ -27,12 +27,26 @@ class Commands:
             await self.client.send_message(message.channel, 'Game already in progress')
             return
 
-        args = Commands.get_args(message)
-        if len(args) != 2:
+        players = Commands.get_args(message)
+
+        if len(players) != 2:
             await self.client.send_message(message.channel, 'Incorrect usage: !newgame [player1] [player2]')
             return
 
-        self.game = tictactoe.Game()
+        users = self.client.get_all_members()
+        game_players = []
+
+        for user in users:
+            user_name = user.display_name
+            if user_name == self.client.user.display_name:
+                continue
+
+            for player in players:
+                if user_name == player:
+                    print('Adding [' + user.id + '] ' + user.name + ' to game')
+                    game_players.append(user)
+
+        # self.game = tictactoe.Game()
 
     async def endgame(self, message):
         if self.game is None:
@@ -43,7 +57,5 @@ class Commands:
     @staticmethod
     def get_args(message):
         elements = message.content.split()
-        print(message.content)
         del elements[0]
-        print(elements)
         return elements
