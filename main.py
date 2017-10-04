@@ -21,7 +21,7 @@ async def on_message(message):
         await handle_command(message)
 
 async def handle_command(message):
-    command = getattr(commands, message.content[1:])
+    command = getattr(commands, message.content[1:], commands.ignore_command)
     await command(client, message)
 
 client.run(token)
