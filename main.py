@@ -1,6 +1,7 @@
 import discord
 import asyncio
 import sys
+import commands
 
 if len(sys.argv) != 2:
     print('Usage: python3 main.py [token]')
@@ -16,7 +17,11 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.content.startswith('!ping'):
-        await client.send_message(message.channel, 'Pong!')
+    if message.content.startswith('!'):
+        await handle_command(message)
+
+async def handle_command(message):
+    command = getattr(commands, message.content[1:])
+    await command(client, message)
 
 client.run(token)
