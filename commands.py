@@ -48,13 +48,13 @@ class Commands:
                     print('Adding [' + user.id + '] ' + user.name + ' to game')
                     game_players.append(user)
 
-        self.game = tictactoe.Game(self.client, message.channel, game_players)
+        self.game = tictactoe.Game(self.client, message.channel, game_players, lambda: self.endgame(message))
         await self.game.run()
-        # await self.endgame(message)
 
     async def endgame(self, message):
         if self.game is None:
             await self.client.send_message(message.channel, 'No game to end')
+            return
 
         await self.client.send_message(message.channel, 'Ending game.')
         self.game = None

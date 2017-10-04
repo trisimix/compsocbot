@@ -2,12 +2,13 @@ import random
 
 
 class Game:
-    def __init__(self, client, channel, players):
+    def __init__(self, client, channel, players, on_game_over):
         self.players = players
         self.client = client
         self.channel = channel
         self.symbols = ['X', 'O']
         self.current_player = random.randint(0, 1)
+        self.on_game_over = on_game_over;
         self.board = [
             ['1', '2', '3'],
             ['4', '5', '6'],
@@ -25,7 +26,10 @@ class Game:
             return isinstance(msg, int) and msg >= 1 and msg <= 9
 
         player = None
-        while not self.check_victory():
+        turn_count = 0
+        victory = False
+
+        while not victory and turn_count < 9:
             player = self.players[self.current_player]
 
             await self.client.send_message(
@@ -42,8 +46,18 @@ class Game:
             else:
                 self.current_player = 1
 
+            turn_count += 1
+            victory = self.check_victory()
+
         await self.client.send_message(self.channel, self.get_board_display())
-        await self.client.send_message(self.channel, player.display_name + ' wins!')
+
+        if victory:
+            endgame_msg = player.display_name + ' wins!'
+        else:
+            endgame_msg = 'Draw!'
+
+        await self.client.send_message(self.channel, endgame_msg)
+        await self.on_game_over()
 
     def get_board_display(self):
         output = '```\n'
