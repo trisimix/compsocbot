@@ -10,13 +10,15 @@ class Commands:
         await self.client.send_message(message.channel, 'pong!')
 
     async def quote(self, message):
-
         await self.client.send_message(message.channel, '***SPEED AND POWER***')
 
-    async def ignore_command(self, message):
+    async def ignore(self, message):
         print('Ignoring invalid command: ' + message.content)
 
     async def stop(self, message):
+        if self.game is not None:
+            await self.endgame(message)
+
         logout_message = await self.client.send_message(message.channel, '_Getting fired from BBC_')
         await asyncio.sleep(5)
         await self.client.delete_message(logout_message)
@@ -46,12 +48,15 @@ class Commands:
                     print('Adding [' + user.id + '] ' + user.name + ' to game')
                     game_players.append(user)
 
-        # self.game = tictactoe.Game()
+        self.game = tictactoe.Game(self.client, message.channel, game_players)
+        await self.game.run()
+        # await self.endgame(message)
 
     async def endgame(self, message):
         if self.game is None:
             await self.client.send_message(message.channel, 'No game to end')
 
+        await self.client.send_message(message.channel, 'Ending game.')
         self.game = None
 
     @staticmethod

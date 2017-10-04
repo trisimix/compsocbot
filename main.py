@@ -24,7 +24,7 @@ async def on_message(message):
 
 
 async def handle_command(message):
-    command = getattr(commands, message.content.split()[0][1:], commands.ignore_command)
+    command = getattr(commands, message.content.split()[0][1:], commands.ignore)
     await client.delete_message(message)
     await command(message)
 
